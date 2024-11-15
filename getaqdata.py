@@ -102,26 +102,27 @@ def connect_and_read(tick_interval_seconds: int, nth_tick_to_refresh_fybra: int,
                 fybra_values=[]
                 accuweather_aq_values=[]
                 while True:
-                    
-                    nth_tick_fybra = nth_tick_fybra + 1
-                    nth_tick_aq = nth_tick_aq + 1
-                    
-                    
-                    if nth_tick_fybra >= nth_tick_to_refresh_fybra or is_first_iteration:
-                        # do not reload page and just read again from the same page as the values are dynamic
-                        fybra_values = read_fybra_device_values(fybra_page)
-                        nth_tick_fybra = 0
-                    
-                    if nth_tick_aq >= nth_tick_to_refresh_aq or is_first_iteration:
-                        # refresh accuweather page as the values are not dynamic
-                        navigate_to_accuweather_aq_page(accuweather_page)
-                        accuweather_aq_values = read_accuweather_aq_values(accuweather_page)
-                        nth_tick_aq = 0
+                    try:
+                        nth_tick_fybra = nth_tick_fybra + 1
+                        nth_tick_aq = nth_tick_aq + 1
                         
-                    is_first_iteration = False
+                        
+                        if nth_tick_fybra >= nth_tick_to_refresh_fybra or is_first_iteration:
+                            # do not reload page and just read again from the same page as the values are dynamic
+                            fybra_values = read_fybra_device_values(fybra_page)
+                            nth_tick_fybra = 0
+                        
+                        if nth_tick_aq >= nth_tick_to_refresh_aq or is_first_iteration:
+                            # refresh accuweather page as the values are not dynamic
+                            navigate_to_accuweather_aq_page(accuweather_page)
+                            accuweather_aq_values = read_accuweather_aq_values(accuweather_page)
+                            nth_tick_aq = 0
+                            
+                        is_first_iteration = False
 
-                    callback(fybra_values, accuweather_aq_values)
-
+                        callback(fybra_values, accuweather_aq_values)
+                    except:
+                        pass
                     time.sleep(tick_interval_seconds)
 
     except Exception as e:
