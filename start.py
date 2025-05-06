@@ -5,6 +5,8 @@ from getaqdata import connect_and_read
 
 
 def render(rgbImage):
+  #R,G,B = rgbImage.split()
+  #display_image(Image.merge('RGB', (B, G, R)))
   ST7735.display_image(rgbImage)
 
 def textsize(text, font):
@@ -28,6 +30,7 @@ def drawTextAtPos(draw, font, left, top, text, color):
   return left, top, textWidth, textHeight
 
 def drawTextLeft(draw, font, top, padding, rowwidth, text, color):
+  #w, h = draw.textsize(text, font=font)
   return drawTextAtPos(draw=draw, font=font, left=padding, top=top, text=text, color=color)
 
 def drawTextRight(draw, font, top, padding, rowwidth, text, color):
@@ -80,7 +83,7 @@ def get_aq_value_index_icon(index: int):
   else:
       return 'poisonous.bmp'  
 
-def getPageOne(fybra_device_values: list[str], aq_values: list[list[str]]):
+def getPageOne(fybra_device_values: list[str] | None, aq_values: list[list[str]] | None):
   screenWidth = 128
   screenHeight = 160
   
@@ -111,85 +114,110 @@ def getPageOne(fybra_device_values: list[str], aq_values: list[list[str]]):
   fontNormal = ImageFont.truetype("droid-sans.regular.ttf", size=12)
   fontBig = ImageFont.truetype("droid-sans.bold.ttf", size=12)
   
-  
-  ppmCO2Inside = int(fybra_device_values[0].split(" ")[0])
-  vocInside = int(fybra_device_values[3].split(" ")[0])
-  currentAQIconIn = None
-
-    
-  if(ppmCO2Inside >= 2201 or vocInside >= 401):
-    currentAQIconIn = "poisonous.bmp"
-  elif((ppmCO2Inside >= 1701 and ppmCO2Inside <= 2200) or (vocInside >= 311 and vocInside <= 400)):
-    currentAQIconIn = "very-poor.bmp"
-  elif((ppmCO2Inside >= 1301 and ppmCO2Inside <= 1700) or (vocInside >= 231 and vocInside <= 310)):
-    currentAQIconIn = "poor.bmp"
-  elif((ppmCO2Inside >= 1001 and ppmCO2Inside <= 1300) or (vocInside >= 151 and vocInside <= 230)):
-    currentAQIconIn = "moderate.bmp"
-  elif((ppmCO2Inside >= 701 and ppmCO2Inside <= 1000) or (vocInside >= 71 and vocInside <= 150)):
-    currentAQIconIn = "fair.bmp"
-  elif(ppmCO2Inside <= 700 or vocInside <= 70):
-    currentAQIconIn = "good.bmp"
-
-    
-  for i in range(len(aq_values)):   
-      drawTextLeft(
+  if(aq_values == None):
+      drawTextCenter(
         draw=draw, 
         font=fontNormal, 
-        top=5 + (17 * i), 
+        top=50, 
         padding=leftRightPadding, 
         rowwidth=screenWidth, 
-        text="{label} | {value}".format(label="".join(aq_values[i][0].split(" ")), index=aq_values[i][1], value=aq_values[i][2]), 
-        color=get_aq_value_index_color(int(aq_values[i][1]))
+        text="Accuweather Error", 
+        color="#FF0000"
       )
+  else:
+        
+      for i in range(len(aq_values)):   
+          drawTextLeft(
+            draw=draw, 
+            font=fontNormal, 
+            top=5 + (17 * i), 
+            padding=leftRightPadding, 
+            rowwidth=screenWidth, 
+            text="{label} | {value}".format(label="".join(aq_values[i][0].split(" ")), index=aq_values[i][1], value=aq_values[i][2]), 
+            color=get_aq_value_index_color(int(aq_values[i][1]))
+          )
+          
       
-  
-  all_aq_indexes = list(map(lambda x: int(x[1]), aq_values))
-  
-  max_aq_index = max(all_aq_indexes)
-  drawImageRight(
-    top=56,
-    padding=leftRightPadding, 
-    rowwidth=screenWidth, 
-    targetImage=image, 
-    imageToDraw=Image.open("icons/aq/{t}/{i}".format(i=get_aq_value_index_icon(max_aq_index), t=iconThemeFolder))
-  )
-
-  drawHorizontalRule(image=image, draw=draw, top=112, padding=3, thick=1, fill="black")
-
-  drawTextLeft(
-    draw=draw, 
-    font=fontNormal, 
-    top=119, 
-    padding=leftRightPadding, 
-    rowwidth=screenWidth, 
-    text="In CO2: " + str(ppmCO2Inside) + " ppm", 
-    color=displayFontColor
-  )
-
-  
-  drawTextLeft(
-    draw=draw, 
-    font=fontNormal, 
-    top=138, 
-    padding=leftRightPadding, 
-    rowwidth=screenWidth, 
-    text="In VOC: "+ str(vocInside), 
-    color=displayFontColor
-  )
-  
-  if currentAQIconIn != None:
+      all_aq_indexes = list(map(lambda x: int(x[1]), aq_values))
+      
+      max_aq_index = max(all_aq_indexes)
       drawImageRight(
-        top=127, 
+        top=56,
         padding=leftRightPadding, 
         rowwidth=screenWidth, 
         targetImage=image, 
-        imageToDraw=Image.open("icons/aq/{t}/{i}".format(i=currentAQIconIn, t=iconThemeFolder))
+        imageToDraw=Image.open("icons/aq/{t}/{i}".format(i=get_aq_value_index_icon(max_aq_index), t=iconThemeFolder))
       )
+      
+
+  drawHorizontalRule(image=image, draw=draw, top=112, padding=3, thick=1, fill="black")
+  
+
+  if(fybra_device_values == None):
+      drawTextCenter(
+        draw=draw, 
+        font=fontNormal, 
+        top=128, 
+        padding=leftRightPadding, 
+        rowwidth=screenWidth, 
+        text="Fybra Sensor Error", 
+        color="#FF0000"
+      )
+  else:
+      
+      ppmCO2Inside = int(fybra_device_values[0].split(" ")[0])
+      vocInside = int(fybra_device_values[3].split(" ")[0])
+      currentAQIconIn = None
+
+        
+      if(ppmCO2Inside >= 2201 or vocInside >= 401):
+        currentAQIconIn = "poisonous.bmp"
+      elif((ppmCO2Inside >= 1701 and ppmCO2Inside <= 2200) or (vocInside >= 311 and vocInside <= 400)):
+        currentAQIconIn = "very-poor.bmp"
+      elif((ppmCO2Inside >= 1301 and ppmCO2Inside <= 1700) or (vocInside >= 231 and vocInside <= 310)):
+        currentAQIconIn = "poor.bmp"
+      elif((ppmCO2Inside >= 1001 and ppmCO2Inside <= 1300) or (vocInside >= 151 and vocInside <= 230)):
+        currentAQIconIn = "moderate.bmp"
+      elif((ppmCO2Inside >= 701 and ppmCO2Inside <= 1000) or (vocInside >= 71 and vocInside <= 150)):
+        currentAQIconIn = "fair.bmp"
+      elif(ppmCO2Inside <= 700 or vocInside <= 70):
+        currentAQIconIn = "good.bmp"
+
+
+      drawTextLeft(
+        draw=draw, 
+        font=fontNormal, 
+        top=119, 
+        padding=leftRightPadding, 
+        rowwidth=screenWidth, 
+        text="In CO2: " + str(ppmCO2Inside) + " ppm", 
+        color=displayFontColor
+      )
+
+      
+      drawTextLeft(
+        draw=draw, 
+        font=fontNormal, 
+        top=138, 
+        padding=leftRightPadding, 
+        rowwidth=screenWidth, 
+        text="In VOC: "+ str(vocInside), 
+        color=displayFontColor
+      )
+      
+      if currentAQIconIn != None:
+          drawImageRight(
+            top=127, 
+            padding=leftRightPadding, 
+            rowwidth=screenWidth, 
+            targetImage=image, 
+            imageToDraw=Image.open("icons/aq/{t}/{i}".format(i=currentAQIconIn, t=iconThemeFolder))
+          )
 
   return image
 
 
-def on_read_aq_data(fybra_device_values: list[str], aq_values: list[list[str]]):
+def on_read_aq_data(fybra_device_values: list[str] | None, aq_values: list[list[str]] | None):
     #print(fybra_device_values)
     #print(aq_values)
     page_image = getPageOne(fybra_device_values, aq_values)
@@ -204,12 +232,14 @@ updateInterval = 5*60
 try:
     ST7735.init_gpio()  # Initialize GPIO
     ST7735.initialize_display()  # Initialize the display
-    connect_and_read(tick_interval_seconds=60, nth_tick_to_refresh_fybra=1, nth_tick_to_refresh_aq=10, callback=on_read_aq_data)
+    connect_and_read(tick_interval_seconds=10, nth_tick_to_refresh_fybra=1, nth_tick_to_refresh_aq=1, callback=on_read_aq_data)
 except Exception as e:
         print("\nGeneric Error.\n")
-        with open("startpy_log.log", "w") as log:
+        #This line opens a log file
+        with open("startpy_log.txt", "w") as log:
             traceback.print_exc(file=log)
             traceback.print_exc()
 finally:
    ST7735.cleanup_gpio()
+
 
