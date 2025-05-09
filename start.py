@@ -140,7 +140,7 @@ def getPageOne(fybra_device_values: list[str] | None, aq_values: list[list[str]]
       
       all_aq_indexes = list(map(lambda x: int(x[1]), aq_values))
       
-      if(len(all_aq_indexes)>0:
+      if(len(all_aq_indexes)>0):
           max_aq_index = max(all_aq_indexes)
           drawImageRight(
             top=56,
