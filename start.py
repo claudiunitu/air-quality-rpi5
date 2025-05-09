@@ -140,14 +140,15 @@ def getPageOne(fybra_device_values: list[str] | None, aq_values: list[list[str]]
       
       all_aq_indexes = list(map(lambda x: int(x[1]), aq_values))
       
-      max_aq_index = max(all_aq_indexes)
-      drawImageRight(
-        top=56,
-        padding=leftRightPadding, 
-        rowwidth=screenWidth, 
-        targetImage=image, 
-        imageToDraw=Image.open("icons/aq/{t}/{i}".format(i=get_aq_value_index_icon(max_aq_index), t=iconThemeFolder))
-      )
+      if(len(all_aq_indexes)>0:
+          max_aq_index = max(all_aq_indexes)
+          drawImageRight(
+            top=56,
+            padding=leftRightPadding, 
+            rowwidth=screenWidth, 
+            targetImage=image, 
+            imageToDraw=Image.open("icons/aq/{t}/{i}".format(i=get_aq_value_index_icon(max_aq_index), t=iconThemeFolder))
+          )
       
 
   drawHorizontalRule(image=image, draw=draw, top=112, padding=3, thick=1, fill="black")
