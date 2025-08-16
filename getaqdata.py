@@ -145,7 +145,7 @@ def connect_and_read(tick_interval_seconds: int, nth_tick_to_refresh_fybra: int,
                     is_first_iteration = False
                     try:
                         if (fybra_values != None or accuweather_aq_values != None ):
-                        callback(fybra_values, accuweather_aq_values)
+                            callback(fybra_values, accuweather_aq_values)
                     except Exception as e:
                         print("\nCallback Error.\n")
                         #This line opens a log file
