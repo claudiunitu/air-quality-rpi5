@@ -38,16 +38,16 @@ def navigate_to_fybra_device_details_page(page: Page, env_data)-> bool:
         page.click("form button")
 
         # Wait for the main page to load and click the Devices menu item
-        page.wait_for_selector(".menu-items")
+        page.wait_for_selector(".menu-items", timeout=2000)
         
         page.click(".menu-items a[href='/home-devices']")
 
         # Wait for the devices page to load, then click the device detail button
-        page.wait_for_selector("ngx-device-detail-button")
+        page.wait_for_selector("ngx-device-detail-button", timeout=2000)
         page.click("ngx-device-detail-button")
 
         # Wait for the popup dialog to appear
-        page.wait_for_selector("ngx-new-dev-dialog")
+        page.wait_for_selector("ngx-new-dev-dialog", timeout=2000)
         return True
     except Exception as e:
         print(f"An error occurred: {str(e)}")
