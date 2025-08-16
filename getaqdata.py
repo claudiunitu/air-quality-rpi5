@@ -152,7 +152,6 @@ def connect_and_read(tick_interval_seconds: int, nth_tick_to_refresh_fybra: int,
                         with open("getaqdata_log.txt", "a") as log:
                             traceback.print_exc(file=log)
                             traceback.print_exc()
-                        return None
 
                     time.sleep(tick_interval_seconds)
 
